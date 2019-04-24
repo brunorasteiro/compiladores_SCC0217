@@ -5,22 +5,35 @@ start_c "{"
 end_c "}"
 middle_c [^}]
 COMMENT {start_c}{middle_c}*{end_c}
+
+/* skip */
+SKIP {COMMENT}|\n|" "
+
 /* basics declarations */
 LETTER [a-zA-Z]
 DIGIT [0-9]
-/* numeros */
-INT {DIGIT}+
-REAL {DIGIT}+\.{DIGIT}+
-/* identificador */
+SIMBOLO [;]
+
+/* numbers */
+INT -?{DIGIT}+
+REAL -?{DIGIT}+\.{DIGIT}+
+NUMBER {INT}|{REAL}
+
+/* symbols */
+RELATION =|<>|>=|<=|>|<
+OP_AD [\+-]
+OP_MUL [\*/]
+
+/* identificators */
 ID {LETTER}({LETTER}|{DIGIT})*
 
 
 /** REGRAS DE TRADUÇÃO DE REGEX's**/
 %%
-{COMMENT}   {/*do nothing*/}
-{INT}       {printf("numero_int: %s", yytext);}
-{REAL}      {printf("numero_real: %s", yytext);}
-{ID}        {printf("id: %s", yytext);}
+{SKIP}      {/*do nothing*/}
+{NUMBER}    {printf("num: %s\n", yytext);}
+{ID}        {printf("id: %s\n", yytext);}
+{RELATION}  {printf("rel: %s\n", yytext);}
 %%
 
 /** FUNÇÕES AUXILIARES **/
