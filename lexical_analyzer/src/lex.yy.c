@@ -470,7 +470,7 @@ int yy_flex_debug = 0;
 char *yytext;
 #line 1 "src/lex.l"
 /** DECLARAÇÕES **/
-/* comentário {...}*/
+/* comment {...} */
 /* basics declarations */
 /* numeros */
 /* identificador */
@@ -756,7 +756,7 @@ case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
 #line 20 "src/lex.l"
-
+{/*do nothing*/}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP

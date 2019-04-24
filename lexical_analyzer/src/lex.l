@@ -1,26 +1,26 @@
 /** DECLARAÇÕES **/
 
-/* comentário {...}*/
-START_C "{"
-END_C "}"
-MIDDLE_C [^}]
-comment {START_C}{MIDDLE_C}*{END_C}
+/* comment {...} */
+start_c "{"
+end_c "}"
+middle_c [^}]
+COMMENT {start_c}{middle_c}*{end_c}
 /* basics declarations */
-letter [a-zA-Z]
-digit [0-9]
+LETTER [a-zA-Z]
+DIGIT [0-9]
 /* numeros */
-int {digit}+
-real {digit}+\.{digit}+
+INT {DIGIT}+
+REAL {DIGIT}+\.{DIGIT}+
 /* identificador */
-id {letter}({letter}|{digit})*
+ID {LETTER}({LETTER}|{DIGIT})*
 
 
 /** REGRAS DE TRADUÇÃO DE REGEX's**/
 %%
-{comment}
-{int}       {printf("numero_int: %s", yytext);}
-{real}      {printf("numero_real: %s", yytext);}
-{id}        {printf("id: %s", yytext);}
+{COMMENT}   {/*do nothing*/}
+{INT}       {printf("numero_int: %s", yytext);}
+{REAL}      {printf("numero_real: %s", yytext);}
+{ID}        {printf("id: %s", yytext);}
 %%
 
 /** FUNÇÕES AUXILIARES **/
