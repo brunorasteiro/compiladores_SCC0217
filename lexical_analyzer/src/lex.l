@@ -1,4 +1,9 @@
 /** DECLARAÇÕES **/
+%{
+    void id(cadeia *char){
+        printf("id: %s\n", yytext);
+    }
+%}
 
 /* comment {...} */
 start_c "{"
@@ -32,7 +37,7 @@ ID {LETTER}({LETTER}|{DIGIT})*
 %%
 {SKIP}      {/*do nothing*/}
 {NUMBER}    {printf("num: %s\n", yytext);}
-{ID}        {printf("id: %s\n", yytext);}
+{ID}        {id(yytext);}
 {RELATION}  {printf("rel: %s\n", yytext);}
 %%
 
@@ -41,3 +46,4 @@ int main(){
     yylex();
     return 0;
 }
+
