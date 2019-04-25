@@ -1,6 +1,6 @@
 /** DECLARAÇÕES **/
 %{
-    void id(cadeia *char){
+    void id(){
         printf("id: %s\n", yytext);
     }
 %}
@@ -26,8 +26,8 @@ NUMBER {INT}|{REAL}
 
 /* symbols */
 RELATION =|<>|>=|<=|>|<
-OP_AD [\+-]
-OP_MUL [\*/]
+OP_AD \+|-
+OP_MUL \*|\/
 
 /* identificators */
 ID {LETTER}({LETTER}|{DIGIT})*
@@ -37,8 +37,11 @@ ID {LETTER}({LETTER}|{DIGIT})*
 %%
 {SKIP}      {/*do nothing*/}
 {NUMBER}    {printf("num: %s\n", yytext);}
-{ID}        {id(yytext);}
+{ID}        {id();}
 {RELATION}  {printf("rel: %s\n", yytext);}
+{OP_AD}     {printf("op_ad: %s\n", yytext);}
+{OP_MUL}    {printf("op_mul: %s\n", yytext);}
+
 %%
 
 /** FUNÇÕES AUXILIARES **/
