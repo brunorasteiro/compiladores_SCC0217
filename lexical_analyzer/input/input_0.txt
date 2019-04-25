@@ -1,6 +1,6 @@
-123
-{asd
-        d}456}    
-testeVar1_
-a < b
-2 + 3 - 1 * 4 / 5
+program lalg;
+{entrada}
+var a: integer;
+begin
+readd(a, @, 1);
+end.

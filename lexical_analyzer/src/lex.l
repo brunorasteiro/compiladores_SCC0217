@@ -1,9 +1,14 @@
-/** DECLARAÇÕES **/
+/** DECLARATIONS AND AUXILIAR FUNCTIONS **/
 %{
-    void id(){
-        printf("id: %s\n", yytext);
+    void id(char* chain){
+        /* if chain not in reserved_words */
+            printf("%s - id\n", chain);
+        /* else
+            printf("%s - %s\n", chain, chain);
+        */
     }
 %}
+
 
 /* comment {...} */
 start_c "{"
@@ -17,9 +22,8 @@ SKIP {COMMENT}|\n|" "
 /* basics declarations */
 LETTER [a-zA-Z]
 DIGIT [0-9]
-SIMBOLO [;]
 
-/* numbers */
+/* number */
 INT -?{DIGIT}+
 REAL -?{DIGIT}+\.{DIGIT}+
 NUMBER {INT}|{REAL}
@@ -28,23 +32,26 @@ NUMBER {INT}|{REAL}
 RELATION =|<>|>=|<=|>|<
 OP_AD \+|-
 OP_MUL \*|\/
+SYMBOLS ,|:|;|\.|\(|\)
 
-/* identificators */
+/* identificator */
 ID {LETTER}({LETTER}|{DIGIT})*
 
-
-/** REGRAS DE TRADUÇÃO DE REGEX's**/
+/** TRANSLATE RULES **/
 %%
-{SKIP}      {/*do nothing*/}
-{NUMBER}    {printf("num: %s\n", yytext);}
-{ID}        {id();}
-{RELATION}  {printf("rel: %s\n", yytext);}
-{OP_AD}     {printf("op_ad: %s\n", yytext);}
-{OP_MUL}    {printf("op_mul: %s\n", yytext);}
+{SKIP}          {/*do nothing*/}
+{NUMBER}        {printf("%s - num\n", yytext);}
+{ID}            {id(yytext);}
+{RELATION}      {printf("%s - rel\n", yytext);}
+{OP_AD}         {printf("%s - op_ad\n", yytext);}
+{OP_MUL}        {printf("%s - op_mul\n", yytext);}
+{SYMBOLS}       {printf("%s - %s\n", yytext, yytext);}
+
+.               {printf("%s - erro\n", yytext);}
 
 %%
 
-/** FUNÇÕES AUXILIARES **/
+/** AUXILIAR FUNCTIONS **/
 int main(){
     yylex();
     return 0;
