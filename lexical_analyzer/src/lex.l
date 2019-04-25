@@ -1,13 +1,22 @@
 /** DECLARATIONS AND AUXILIAR FUNCTIONS **/
 %{
+    #include <string.h>
+
     void id(char* chain){
-        /* if chain in reserved_words
+        /* if chain in table of reserved words */
+        if (
+            (strcmp(chain, "program") == 0) ||
+            (strcmp(chain, "var") == 0) ||
+            (strcmp(chain, "integer") == 0) ||
+            (strcmp(chain, "begin") == 0) ||
+            (strcmp(chain, "end") == 0)
+           )
             printf("%s - %s\n", chain, chain);
-        else */
+
+        else
             printf("%s - id\n", chain);
     }
 %}
-
 
 /* comment {...} */
 start_c "{"
@@ -47,7 +56,6 @@ ID {LETTER}({LETTER}|{DIGIT})*
 {SYMBOLS}       {printf("%s - %s\n", yytext, yytext);}
 
 .               {printf("%s - erro\n", yytext);}
-
 %%
 
 /** AUXILIAR FUNCTIONS **/
