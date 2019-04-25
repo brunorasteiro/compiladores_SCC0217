@@ -1,11 +1,10 @@
 /** DECLARATIONS AND AUXILIAR FUNCTIONS **/
 %{
     void id(char* chain){
-        /* if chain not in reserved_words */
-            printf("%s - id\n", chain);
-        /* else
+        /* if chain in reserved_words
             printf("%s - %s\n", chain, chain);
-        */
+        else */
+            printf("%s - id\n", chain);
     }
 %}
 
