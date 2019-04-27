@@ -14,6 +14,7 @@
 
     int keyword(char* s) {
         /* Automaton to check if s is a reserved words. */
+        // keywords = ["begin", "const", "do", "else", "end", ]
         if (*s == 'b') {
             return strcmp(s + 1, "egin") == 0;
         } else if (*s == 'c') {
@@ -21,7 +22,11 @@
         } else if (*s == 'd') {
             return strcmp(s + 1, "o") == 0;
         } else if (*s == 'e') {
-            return strcmp(s + 1, "nd") == 0;
+            if (*(++s) == 'n') {
+                return strcmp(s + 1, "d") == 0;
+            } else if (*s == 'l') {
+                return strcmp(s + 1, "se") == 0;
+            }
         } else if (*s == 'f') {
             return strcmp(s + 1, "or") == 0;
         } else if (*s == 'i') {

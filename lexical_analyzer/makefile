@@ -5,7 +5,7 @@ all: src/lex.l
 test:
 	@echo "test"
 
-# run: src/lex.l
-# 	@flex -o src/lex.yy.c src/lex.l
-# 	@gcc -g src/lex.yy.c -lfl -o bin/prog
-# 	@bin/prog < ./input/input_0.txt
+clean:
+	rm src/lex.yy.c || true
+	rm lex || true
+	rm output.txt || true
