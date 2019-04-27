@@ -1,20 +1,68 @@
 /** DECLARATIONS AND AUXILIAR FUNCTIONS **/
 %{
+    #include <stdio.h>
+    #include <stdlib.h>
     #include <string.h>
 
-    void id(char* chain){
-        /* if chain in table of reserved words */
-        if (
-            (strcmp(chain, "program") == 0) ||
-            (strcmp(chain, "var") == 0) ||
-            (strcmp(chain, "integer") == 0) ||
-            (strcmp(chain, "begin") == 0) ||
-            (strcmp(chain, "end") == 0)
-           )
-            printf("%s - %s\n", chain, chain);
+    FILE* _outputf = NULL;
 
-        else
-            printf("%s - id\n", chain);
+    #define outputf(format, ...) \
+    do { \
+        printf(format, ##__VA_ARGS__); \
+        fprintf(_outputf, format, ##__VA_ARGS__); \
+    } while(0)
+
+    int keyword(char* s) {
+        /* Automaton to check if s is a reserved words. */
+        if (*s == 'b') {
+            return strcmp(s + 1, "egin") == 0;
+        } else if (*s == 'c') {
+            return strcmp(s + 1, "onst") == 0;
+        } else if (*s == 'd') {
+            return strcmp(s + 1, "o") == 0;
+        } else if (*s == 'e') {
+            return strcmp(s + 1, "nd") == 0;
+        } else if (*s == 'f') {
+            return strcmp(s + 1, "or") == 0;
+        } else if (*s == 'i') {
+            if (*(++s) == 'f') {
+                return *(s + 1) == '\0';
+            } else {
+                return strcmp(s, "nteger") == 0;
+            }
+        } else if (*s == 'p') {
+            if (*(++s) == 'r') {
+                if (*(++s) == 'o') {
+                    if (*(++s) == 'c') {
+                        return strcmp(s + 1, "edure") == 0;
+                    } else if (*s == 'g') {
+                        return strcmp(s + 1, "ram") == 0;
+                    }
+                }
+            }
+        } else if (*s == 'r') {
+            if (*(++s) == 'e') {
+                if (*(++s) == 'a') {
+                    if (*(++s) == 'd') {
+                        return *(s + 1) == '\0';
+                    } else if (*s == 'l') {
+                        return *(s + 1) == '\0';
+                    }
+                }
+            }
+        } else if (*s == 't') {
+            return *(s + 1) == 'o';
+        } else if (*s == 'v') {
+            return strcmp(s + 1, "ar") == 0;
+        } else if (*s == 'w') {
+            if (*(++s) == 'h') {
+                return strcmp(s + 1, "ile") == 0;
+            } else if (*s == 'r') {
+                return strcmp(s + 1, "ite") == 0;
+            }
+        }
+
+        return 0;
     }
 %}
 
@@ -54,23 +102,31 @@ SKIP {COMMENT}|{WS}
 /** TRANSLATE RULES **/
 %%
 {SKIP}              {/*do nothing*/}
-{INT}               {printf("%s - num_int\n", yytext);}
-{REAL}              {printf("%s - num_real\n", yytext);}
-{MALFORMED_NUMBER}  {printf("%s - malformed_num\n", yytext);}
-{ID}                {id(yytext);}
-{RELATION}          {printf("%s - rel\n", yytext);}
-{OP_AD}             {printf("%s - op_ad\n", yytext);}
-{OP_MUL}            {printf("%s - op_mul\n", yytext);}
-{POINT}             {printf("%s - %s\n", yytext, yytext);}
-{SYMBOLS}           {printf("%s - %s\n", yytext, yytext);}
+{INT}               {outputf("%s - number_int\n", yytext);}
+{REAL}              {outputf("%s - number_float\n", yytext);}
+{MALFORMED_NUMBER}  {outputf("Error: malformed number '%s' in program\n", yytext);}
+{ID}                {outputf("%s - %s\n", yytext, keyword(yytext) ? yytext : "id");}
+{RELATION}          {outputf("%s - %s\n", yytext, yytext);}
+{OP_AD}             {outputf("%s - %s\n", yytext, yytext);}
+{OP_MUL}            {outputf("%s - %s\n", yytext, yytext);}
+{POINT}             {outputf("%s - %s\n", yytext, yytext);}
+{SYMBOLS}           {outputf("%s - %s\n", yytext, yytext);}
 
-.                   {printf("error: stray ‘%s’ in program\n", yytext);}
+.                   {outputf("Error: stray ‘%s’ in program\n", yytext);}
 
 %%
 
 /** AUXILIAR FUNCTIONS **/
-int main(){
+int main() {
+    _outputf = fopen("output.txt", "w");
+    if(_outputf == NULL) {
+      printf("Error: could not open output file\n");
+      exit(1);
+    }
+
     yylex();
+
+    fclose(_outputf);
+
     return 0;
 }
-
