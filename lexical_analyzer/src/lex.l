@@ -4,13 +4,14 @@
     #include <stdlib.h>
     #include <string.h>
 
-    FILE* _outputf = NULL;
-
     #define outputf(format, ...) \
     do { \
         printf(format, ##__VA_ARGS__); \
         fprintf(_outputf, format, ##__VA_ARGS__); \
     } while(0)
+
+    FILE* _outputf = NULL;
+    int line_number = 1;
 
     int keyword(char* s) {
         /* Automaton to check if s is a reserved words. */
@@ -106,18 +107,18 @@ SKIP {COMMENT}|{WS}
 
 /** TRANSLATE RULES **/
 %%
+"\n"                {line_number++;}
 {SKIP}              {/*do nothing*/}
 {INT}               {outputf("%s - number_int\n", yytext);}
 {REAL}              {outputf("%s - number_float\n", yytext);}
-{MALFORMED_NUMBER}  {outputf("Error: malformed number '%s' in program\n", yytext);}
+{MALFORMED_NUMBER}  {outputf("Error: malformed number '%s' in program (line: %d)\n", yytext, line_number);}
 {ID}                {outputf("%s - %s\n", yytext, keyword(yytext) ? yytext : "id");}
 {RELATION}          {outputf("%s - %s\n", yytext, yytext);}
 {OP_AD}             {outputf("%s - %s\n", yytext, yytext);}
 {OP_MUL}            {outputf("%s - %s\n", yytext, yytext);}
 {POINT}             {outputf("%s - %s\n", yytext, yytext);}
 {SYMBOLS}           {outputf("%s - %s\n", yytext, yytext);}
-
-.                   {outputf("Error: stray ‘%s’ in program\n", yytext);}
+.                   {outputf("Error: stray ‘%s’ in program (line: %d)\n", yytext, line_number);}
 
 %%
 

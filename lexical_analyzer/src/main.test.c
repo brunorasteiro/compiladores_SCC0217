@@ -1,5 +1,9 @@
 #include <stdio.h>
 
 int main() {
-  return 0;
+    int ntests = 2;
+
+    for (int i = 0; i < ntests; i++) {
+    }
+    return 0;
 }

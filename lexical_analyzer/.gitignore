@@ -1,2 +1,4 @@
-bin/
 src/lex.yy.c
+lex
+output.txt
+tmp
