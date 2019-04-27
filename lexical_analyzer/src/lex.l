@@ -24,38 +24,48 @@ end_c "}"
 middle_c [^}]
 COMMENT {start_c}{middle_c}*{end_c}
 
-/* skip */
-SKIP {COMMENT}|\n|" "
-
 /* basics declarations */
 LETTER [a-zA-Z]
 DIGIT [0-9]
 
 /* number */
-INT -?{DIGIT}+
-REAL -?{DIGIT}+\.{DIGIT}+
+INT {DIGIT}+
+REAL {DIGIT}+\.{DIGIT}+
 NUMBER {INT}|{REAL}
+MALFORMED_NUMBER {NUMBER}{ID}
 
 /* symbols */
 RELATION =|<>|>=|<=|>|<
 OP_AD \+|-
 OP_MUL \*|\/
-SYMBOLS ,|:|;|\.|\(|\)
+POINT \.
+SYMBOLS ,|:|;|\(|\)|:=
 
 /* identificator */
 ID {LETTER}({LETTER}|{DIGIT})*
 
+/* boundary */
+WS " "|\r\n|\n|\t
+BOUNDARY {WS}|{RELATION}|{OP_AD}|{OP_MUL}|{SYMBOLS}
+
+/* skip */
+SKIP {COMMENT}|{WS}
+
 /** TRANSLATE RULES **/
 %%
-{SKIP}          {/*do nothing*/}
-{NUMBER}        {printf("%s - num\n", yytext);}
-{ID}            {id(yytext);}
-{RELATION}      {printf("%s - rel\n", yytext);}
-{OP_AD}         {printf("%s - op_ad\n", yytext);}
-{OP_MUL}        {printf("%s - op_mul\n", yytext);}
-{SYMBOLS}       {printf("%s - %s\n", yytext, yytext);}
+{SKIP}              {/*do nothing*/}
+{INT}               {printf("%s - num_int\n", yytext);}
+{REAL}              {printf("%s - num_real\n", yytext);}
+{MALFORMED_NUMBER}  {printf("%s - malformed_num\n", yytext);}
+{ID}                {id(yytext);}
+{RELATION}          {printf("%s - rel\n", yytext);}
+{OP_AD}             {printf("%s - op_ad\n", yytext);}
+{OP_MUL}            {printf("%s - op_mul\n", yytext);}
+{POINT}             {printf("%s - %s\n", yytext, yytext);}
+{SYMBOLS}           {printf("%s - %s\n", yytext, yytext);}
 
-.               {printf("%s - erro\n", yytext);}
+.                   {printf("error: stray ‘%s’ in program\n", yytext);}
+
 %%
 
 /** AUXILIAR FUNCTIONS **/
