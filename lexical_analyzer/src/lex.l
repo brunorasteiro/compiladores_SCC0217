@@ -98,12 +98,9 @@ SYMBOLS ,|:|;|\(|\)|:=
 /* identificator */
 ID {LETTER}({LETTER}|{DIGIT})*
 
-/* boundary */
-WS " "|\r\n|\n|\t
-BOUNDARY {WS}|{RELATION}|{OP_AD}|{OP_MUL}|{SYMBOLS}
-
 /* skip */
-SKIP {COMMENT}|{WS}
+WHITESPACE " "|\r\n|\n|\t
+SKIP {COMMENT}|{WHITESPACE}
 
 /** TRANSLATE RULES **/
 %%
