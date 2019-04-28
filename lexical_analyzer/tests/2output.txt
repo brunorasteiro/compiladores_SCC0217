@@ -1,0 +1,10 @@
+asd - id
+asd - id
+. - .
+qwe - id
+asd - id
+= - =
+qwe - id
+asd - id
+Error: stray ‘@’ in program (line: 4)
+qwe - id

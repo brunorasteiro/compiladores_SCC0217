@@ -1,0 +1,10 @@
+123 - number_int
+123.123 - number_real
+Error: malformed number '123asd' in program (line: 3)
+Error: malformed number '123.123asd' in program (line: 4)
+123.123 - number_real
+Error: stray ‘@’ in program (line: 5)
+sd - id
+123.123 - number_real
+. - .
+123 - number_int
