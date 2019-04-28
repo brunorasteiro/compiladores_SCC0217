@@ -57,7 +57,11 @@
                 }
             }
         } else if (*s == 't') {
-            return *(s + 1) == 'o';
+            if (*(s + 1) == 'o') {
+                return *(s + 1) == '\0';
+            } else if (*(++s) == 'h') {
+                return strcmp(s + 1, "en") == 0;
+            }
         } else if (*s == 'v') {
             return strcmp(s + 1, "ar") == 0;
         } else if (*s == 'w') {
