@@ -57,9 +57,9 @@
                 }
             }
         } else if (*s == 't') {
-            if (*(s + 1) == 'o') {
-                return *(s + 1) == '\0';
-            } else if (*(++s) == 'h') {
+            if (*(++s) == 'o') {
+                return *(++s) == '\0';
+            } else if (*s == 'h') {
                 return strcmp(s + 1, "en") == 0;
             }
         } else if (*s == 'v') {
