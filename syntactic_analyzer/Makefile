@@ -1,7 +1,8 @@
-syntax = src/syntax.y
-lex = src/lex.l
+syntax = syntax.y
+lex = lex.l
 
-all: $(syntax) $(lex)
-	yacc -d $(syntax)
-	lex $(lex)
-	gcc lex.yy.c y.tab.c -o syntactic-analyzer
+all: src/$(syntax) src/$(lex)
+	cd src && yacc -d $(syntax)
+	cd src && lex $(lex)
+	cd src && gcc lex.yy.c y.tab.c -o ../syntactic-analyzer
+	
