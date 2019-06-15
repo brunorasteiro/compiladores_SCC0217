@@ -2,6 +2,7 @@
 #include<stdio.h>
 int yylex();
 void yyerror(char* s);
+void standard_error(char* expected, int obtained);
 %}
 
 %start programa
@@ -52,10 +53,20 @@ void yyerror(char* s);
 %token FECHA_PARENTESES
 
 %%
+/* erros no <corpo> ficam para as regras dentro de corpo traterem */
+programa : PROGRAM IDENT PONTO_VIRGULA corpo PONTO
+        |  error  IDENT {printf("##########\n\n");} PONTO_VIRGULA corpo PONTO {yyerrok; yyclearin; standard_error("program", yychar);}
+        |  PROGRAM error PONTO_VIRGULA corpo PONTO {yyerrok; yyclearin; printf("Erro: identificador esperado\n");}
+        |  PROGRAM IDENT error corpo PONTO {yyerrok; yyclearin; printf("Erro: ';' esperado\n");}
+        |  PROGRAM IDENT PONTO_VIRGULA corpo error {yyerrok; yyclearin; printf("Erro: '.' esperado\n");}
+        |  error {printf("Erro: '.' esperado\n");}
+        ;
 
-programa : PROGRAM IDENT PONTO_VIRGULA corpo PONTO ;
+corpo :   dc _BEGIN comandos END 
+        | dc error comandos END {yyerrok; yyclearin; printf("Erro: '.' esperado\n");}
+        
+        ;
 
-corpo : dc _BEGIN comandos END ;
 
 dc : dc_c dc_v dc_p ;
 
@@ -89,7 +100,10 @@ mais_ident : PONTO_VIRGULA argumentos | ;
 
 pfalsa : ELSE cmd | ;
 
-comandos : cmd PONTO_VIRGULA comandos | ;
+comandos : cmd PONTO_VIRGULA comandos 
+        |  cmd error comandos {yyerrok; printf("Erro: ';' esperado\n");} 
+        |
+        ;
 
 cmd : READ ABRE_PARENTESES variaveis FECHA_PARENTESES |
    WRITE ABRE_PARENTESES variaveis FECHA_PARENTESES |
@@ -124,15 +138,7 @@ numero : NUMERO_INT | NUMERO_REAL ;
 
 %%
 
-void yywrap(){}
-
-void yyerror(char* str)
-{
-	printf("Error: %s\n", str);
-}
-
-void main()
-{
+void main(){
 	//printf("digite expr : \n");
 	yyparse();
 	// printf("expr válida \n");
@@ -142,4 +148,11 @@ void main()
     //     printf("Token: %d\n", token);
     // }
     // return;
+}
+
+void yywrap(){}
+void yyerror(char* str){}
+
+void standard_error(char* expected, int obtained){
+    printf("Erro: Esperado '%s', obtido '%d'\n", expected, obtained);
 }
