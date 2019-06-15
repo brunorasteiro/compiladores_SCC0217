@@ -10,7 +10,6 @@ void yyerror(char* s);
     char *string;
 }
 
-
 %token _BEGIN
 %token CONST
 %token DO
