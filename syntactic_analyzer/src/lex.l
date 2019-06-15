@@ -5,13 +5,8 @@
     #include <string.h>
     #include "y.tab.h"
 
-    #define outputf(format, ...) \
-    do { \
-        printf(format, ##__VA_ARGS__); \
-        fprintf(_outputf, format, ##__VA_ARGS__); \
-    } while(0)
+    #define DEBUG 0
 
-    FILE* _outputf = NULL;
     int line_number = 1;
 
     int keyword(char* s) {
@@ -90,10 +85,10 @@
 %}
 
 /* comment {...} */
-start_c "{"
-end_c "}"
-middle_c [^}]
-COMMENT {start_c}{middle_c}*{end_c}
+START_C "{"
+END_C "}"
+MIDDLE_C [^}]
+COMMENT {START_C}{MIDDLE_C}*{END_C}
 
 /* basics declarations */
 LETTER [a-zA-Z]
@@ -104,14 +99,6 @@ INT {DIGIT}+
 REAL {DIGIT}+\.{DIGIT}+
 NUMBER {INT}|{REAL}
 MALFORMED_NUMBER {NUMBER}{ID}
-
-/* symbols */
-RELATION =|<>|>=|<=|>|<
-OP_AD \+|-
-OP_MUL \*|\/
-POINT \.
-SYMBOLS ,|:|;|\(|\)|:=
-REST {RELATION}|{OP_AD}|{OP_MUL}|{POINT}|{SYMBOLS}
 
 /* identificator */
 ID {LETTER}({LETTER}|{DIGIT})*
@@ -124,28 +111,27 @@ SKIP {COMMENT}|{WHITESPACE}
 %%
 "\n"                {line_number++;}
 {SKIP}              {/*do nothing*/}
-{INT}               {yylval.number=atoi(yytext); return NUMERO_INT;}
-{REAL}              {return NUMERO_REAL;}
-{MALFORMED_NUMBER}  {outputf("Error: malformed number '%s' in program (line: %d)\n", yytext, line_number);}
-{ID}                {printf("%s --> ", yytext); return keyword(yytext);}
-{REST}              {return yytext[0];}
-"="                 {return OP_IGUAL;}
-"<>"                {return OP_DIFERENTE;}
-">="                {return OP_MAIOR_IGUAL;}
-"<="                {return OP_MENOR_IGUAL;}
-">"                 {return OP_MAIOR;}
-"<"                 {return OP_MENOR;}
-"\+"                {return OP_ADICAO;}
-"-"                 {return OP_SUBTRACAO;}
-"\*"                {return OP_MULTIPLICACAO;}
-"\/"                {return OP_DIVISAO;}
-":="                {return OP_ATRIBUICAO;}
-"\."                {return PONTO;}
-","                 {return VIRGULA;}
-":"                 {return DOIS_PONTOS;}
-";"                 {return PONTO_VIRGULA;}
-"\("                {return ABRE_PARENTESES;}
-"\)"                {return FECHA_PARENTESES;}
-.                   {outputf("Error: stray ‘%s’ in program (line: %d)\n", yytext, line_number);}
+{INT}               {if (DEBUG) printf("%s - number_int\n", yytext); yylval.number=atoi(yytext); return NUMERO_INT;}
+{REAL}              {if (DEBUG) printf("%s - number_real\n", yytext); return NUMERO_REAL;}
+{MALFORMED_NUMBER}  {printf("Error: malformed number '%s' in program (line: %d)\n", yytext, line_number);}
+{ID}                {if (DEBUG) printf("%s - %s\n", yytext, keyword(yytext) == IDENT ? "id" : yytext); return keyword(yytext);}
+":="                {if (DEBUG) printf("%s - %s\n", ":=", ":="); return OP_ATRIBUICAO;}
+"<>"                {if (DEBUG) printf("%s - %s\n", "<>", "<>"); return OP_DIFERENTE;}
+">="                {if (DEBUG) printf("%s - %s\n", ">=", ">="); return OP_MAIOR_IGUAL;}
+"<="                {if (DEBUG) printf("%s - %s\n", "<=", "<="); return OP_MENOR_IGUAL;}
+"="                 {if (DEBUG) printf("%s - %s\n", "=", "="); return OP_IGUAL;}
+">"                 {if (DEBUG) printf("%s - %s\n", ">", ">"); return OP_MAIOR;}
+"<"                 {if (DEBUG) printf("%s - %s\n", "<", "<"); return OP_MENOR;}
+"\+"                {if (DEBUG) printf("%s - %s\n", "+", "+"); return OP_ADICAO;}
+"-"                 {if (DEBUG) printf("%s - %s\n", "-", "-"); return OP_SUBTRACAO;}
+"\*"                {if (DEBUG) printf("%s - %s\n", "*", "*"); return OP_MULTIPLICACAO;}
+"\/"                {if (DEBUG) printf("%s - %s\n", "/", "/"); return OP_DIVISAO;}
+"\."                {if (DEBUG) printf("%s - %s\n", ".", "."); return PONTO;}
+","                 {if (DEBUG) printf("%s - %s\n", ",", ","); return VIRGULA;}
+":"                 {if (DEBUG) printf("%s - %s\n", ":", ":"); return DOIS_PONTOS;}
+";"                 {if (DEBUG) printf("%s - %s\n", ";", ";"); return PONTO_VIRGULA;}
+"\("                {if (DEBUG) printf("%s - %s\n", "(", "("); return ABRE_PARENTESES;}
+"\)"                {if (DEBUG) printf("%s - %s\n", ")", ")"); return FECHA_PARENTESES;}
+.                   {printf("Error: stray ‘%s’ in program (line: %d)\n", yytext, line_number);}
 
 %%
