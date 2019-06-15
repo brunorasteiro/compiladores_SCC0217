@@ -4,7 +4,9 @@ int yylex();
 void yyerror(char* s);
 %}
 
-%union 
+%start programa
+
+%union
 {
     int number;
     char *string;
@@ -57,37 +59,37 @@ corpo : dc _BEGIN comandos END ;
 
 dc : dc_c dc_v dc_p ;
 
-dc_c : CONST IDENT OP_IGUAL numero PONTO_VIRGULA dc_c | %empty ;
+dc_c : CONST IDENT OP_IGUAL numero PONTO_VIRGULA dc_c | ;
 
-dc_v : VAR variaveis DOIS_PONTOS tipo_var PONTO_VIRGULA dc_v | %empty ;
+dc_v : VAR variaveis DOIS_PONTOS tipo_var PONTO_VIRGULA dc_v | ;
 
 tipo_var : REAL | INTEGER ;
 
 variaveis : IDENT mais_var ;
 
-mais_var : VIRGULA variaveis | %empty ;
+mais_var : VIRGULA variaveis | ;
 
-dc_p : PROCEDURE IDENT parametros PONTO_VIRGULA corpo_p dc_p | %empty ;
+dc_p : PROCEDURE IDENT parametros PONTO_VIRGULA corpo_p dc_p | ;
 
-parametros : ABRE_PARENTESES lista_par FECHA_PARENTESES | %empty ;
+parametros : ABRE_PARENTESES lista_par FECHA_PARENTESES | ;
 
 lista_par : variaveis DOIS_PONTOS tipo_var mais_par ;
 
-mais_par : PONTO_VIRGULA lista_par | %empty ;
+mais_par : PONTO_VIRGULA lista_par | ;
 
 corpo_p : dc_loc _BEGIN comandos END PONTO_VIRGULA ;
 
 dc_loc : dc_v ;
 
-lista_arg : ABRE_PARENTESES argumentos FECHA_PARENTESES | %empty ;
+lista_arg : ABRE_PARENTESES argumentos FECHA_PARENTESES | ;
 
 argumentos : IDENT mais_ident ;
 
-mais_ident : PONTO_VIRGULA argumentos | %empty ;
+mais_ident : PONTO_VIRGULA argumentos | ;
 
-pfalsa : ELSE cmd | %empty ;
+pfalsa : ELSE cmd | ;
 
-comandos : cmd PONTO_VIRGULA comandos | %empty ;
+comandos : cmd PONTO_VIRGULA comandos | ;
 
 cmd : READ ABRE_PARENTESES variaveis FECHA_PARENTESES |
    WRITE ABRE_PARENTESES variaveis FECHA_PARENTESES |
@@ -96,7 +98,7 @@ cmd : READ ABRE_PARENTESES variaveis FECHA_PARENTESES |
    IDENT OP_ATRIBUICAO expressao |
    IDENT lista_arg |
    _BEGIN comandos END |
-   FOR IDENT TO numero DO cmd ;
+   FOR IDENT OP_ATRIBUICAO expressao TO expressao DO cmd ;
 
 condicao : expressao relacao expressao ;
 
@@ -104,15 +106,15 @@ relacao : OP_IGUAL | OP_DIFERENTE | OP_MAIOR_IGUAL | OP_MENOR_IGUAL | OP_MENOR |
 
 expressao : termo outros_termos ;
 
-op_un : OP_ADICAO | OP_SUBTRACAO | %empty ;
+op_un : OP_ADICAO | OP_SUBTRACAO | ;
 
-outros_termos : op_ad termo outros_termos | %empty ;
+outros_termos : op_ad termo outros_termos | ;
 
 op_ad : OP_ADICAO | OP_SUBTRACAO ;
 
 termo : op_un fator mais_fatores ;
 
-mais_fatores : op_mul fator mais_fatores | %empty ;
+mais_fatores : op_mul fator mais_fatores | ;
 
 op_mul : OP_MULTIPLICACAO | OP_DIVISAO ;
 
@@ -126,18 +128,18 @@ void yywrap(){}
 
 void yyerror(char* str)
 {
-	printf("Error\n");  
+	printf("Error: %s\n", str);
 }
+
 void main()
 {
 	//printf("digite expr : \n");
 	yyparse();
-	printf("expr válida \n");
+	// printf("expr válida \n");
 	// int token;
-    // while ((token = yylex()) != 0) 
+    // while ((token = yylex()) != 0)
     // {
     //     printf("Token: %d\n", token);
     // }
     // return;
 }
-

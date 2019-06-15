@@ -5,7 +5,7 @@
     #include <string.h>
     #include "y.tab.h"
 
-    #define DEBUG 0
+    #define DEBUG 1
 
     int line_number = 1;
 
@@ -67,6 +67,8 @@
         } else if (*s == 't') {
             if (*(s + 1) == 'o')
                 return TO;
+            else if (strcmp(s + 1, "hen") == 0)
+              return THEN;
         } else if (*s == 'v') {
             if (strcmp(s + 1, "ar") == 0)
                 return VAR;

@@ -1,0 +1,5 @@
+program nome1;
+var foo: integer;
+begin
+    bar := 2 + 2;
+end.

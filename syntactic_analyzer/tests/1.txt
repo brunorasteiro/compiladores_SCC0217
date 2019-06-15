@@ -11,9 +11,9 @@ begin
     end;
     for b:=1 to 10 do
     begin
-        b:=b+2;
+        b:=b+2
         a:=a-1;
     end;
-    if a<> b then 
+    if a<> b then
         write(a);
 end.
