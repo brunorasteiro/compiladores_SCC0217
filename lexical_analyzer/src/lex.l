@@ -57,7 +57,11 @@
                 }
             }
         } else if (*s == 't') {
-            return *(s + 1) == 'o';
+            if (*(++s) == 'o') {
+                return *(++s) == '\0';
+            } else if (*s == 'h') {
+                return strcmp(s + 1, "en") == 0;
+            }
         } else if (*s == 'v') {
             return strcmp(s + 1, "ar") == 0;
         } else if (*s == 'w') {
@@ -107,7 +111,7 @@ SKIP {COMMENT}|{WHITESPACE}
 "\n"                {line_number++;}
 {SKIP}              {/*do nothing*/}
 {INT}               {outputf("%s - number_int\n", yytext);}
-{REAL}              {outputf("%s - number_float\n", yytext);}
+{REAL}              {outputf("%s - number_real\n", yytext);}
 {MALFORMED_NUMBER}  {outputf("Error: malformed number '%s' in program (line: %d)\n", yytext, line_number);}
 {ID}                {outputf("%s - %s\n", yytext, keyword(yytext) ? yytext : "id");}
 {RELATION}          {outputf("%s - %s\n", yytext, yytext);}
