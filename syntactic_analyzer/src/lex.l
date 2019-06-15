@@ -129,6 +129,23 @@ SKIP {COMMENT}|{WHITESPACE}
 {MALFORMED_NUMBER}  {outputf("Error: malformed number '%s' in program (line: %d)\n", yytext, line_number);}
 {ID}                {printf("%s --> ", yytext); return keyword(yytext);}
 {REST}              {return yytext[0];}
+"="                 {return OP_IGUAL;}
+"<>"                {return OP_DIFERENTE;}
+">="                {return OP_MAIOR_IGUAL;}
+"<="                {return OP_MENOR_IGUAL;}
+">"                 {return OP_MAIOR;}
+"<"                 {return OP_MENOR;}
+"\+"                {return OP_ADICAO;}
+"-"                 {return OP_SUBTRACAO;}
+"\*"                {return OP_MULTIPLICACAO;}
+"\/"                {return OP_DIVISAO;}
+":="                {return OP_ATRIBUICAO;}
+"\."                {return PONTO;}
+","                 {return VIRGULA;}
+":"                 {return DOIS_PONTOS;}
+";"                 {return PONTO_VIRGULA;}
+"\("                {return ABRE_PARENTESES;}
+"\)"                {return FECHA_PARENTESES;}
 .                   {outputf("Error: stray ‘%s’ in program (line: %d)\n", yytext, line_number);}
 
 %%
