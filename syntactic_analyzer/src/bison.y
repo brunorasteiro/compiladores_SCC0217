@@ -62,9 +62,9 @@ programa : PROGRAM IDENT PONTO_VIRGULA corpo PONTO
         |  error {printf("Erro: '.' esperado\n");}
         ;
 
-corpo :   dc _BEGIN comandos END 
+corpo :   dc _BEGIN comandos END
         | dc error comandos END {yyerrok; yyclearin; printf("Erro: '.' esperado\n");}
-        
+
         ;
 
 
@@ -100,8 +100,8 @@ mais_ident : PONTO_VIRGULA argumentos | ;
 
 pfalsa : ELSE cmd | ;
 
-comandos : cmd PONTO_VIRGULA comandos 
-        |  cmd error comandos {yyerrok; printf("Erro: ';' esperado\n");} 
+comandos : cmd PONTO_VIRGULA comandos
+        |  cmd error comandos {yyerrok; printf("Erro: ';' esperado\n");}
         |
         ;
 
@@ -150,7 +150,6 @@ void main(){
     // return;
 }
 
-void yywrap(){}
 void yyerror(char* str){}
 
 void standard_error(char* expected, int obtained){

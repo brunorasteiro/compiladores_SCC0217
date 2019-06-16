@@ -1,0 +1,6 @@
+asd             - ident
+Error: stray ‘@’ in program (line: 2)
+sd              - ident
+Error: stray ‘@’ in program (line: 3)
+Error: stray ‘$’ in program (line: 3)
+d               - ident

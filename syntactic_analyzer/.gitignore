@@ -1,4 +1,5 @@
 src/lex.yy.c
 src/y.tab.c
 src/y.tab.h
+lexical-analyzer
 syntactic-analyzer
