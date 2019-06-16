@@ -5,12 +5,14 @@
 extern FILE* yyin;
 extern int yydebug;
 extern int yylex();
-void yyerror(char* s);
+void yyerror(const char* s);
 // void standard_error(char* expected, int obtained);
 
 %} /* Bison Declarations */
 
 %start programa
+
+%define parse.error verbose
 
 %token _BEGIN
 %token CONST
@@ -111,7 +113,7 @@ numero : NUMERO_INT | NUMERO_REAL ;
 
 %% /* Epilogue */
 
-void yyerror(char* msg) {
+void yyerror(const char* msg) {
   fprintf(stderr, "%s\n", msg);
 }
 
