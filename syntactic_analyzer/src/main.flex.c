@@ -1,9 +1,15 @@
+/**
+ * This file defines the main function for the
+ * lexical analyzer alone, as specified in the
+ * first assignment.
+ */
+
 #include <stdio.h>
 #include "y.tab.h"
 
 extern FILE* yyin;
 extern char* yytext;
-int yylex();
+extern int yylex();
 
 char* token_label(int token);
 

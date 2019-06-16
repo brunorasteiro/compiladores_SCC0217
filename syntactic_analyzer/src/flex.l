@@ -2,15 +2,14 @@
 %{
 #include <stdio.h>
 #include "y.tab.h"
-
-int line_number = 1;
 %}
 
-%option noyywrap bison-bridge
+%option bison-bridge
+%option noyywrap
+%option yylineno
 
 /* whitespace: / |\t|\r?\n/ */
-NEWLINE     \r?\n
-WHITESPACE  " "|\t|{NEWLINE}
+WHITESPACE  " "|\t|\r?\n
 
 /* comment: /{[^}]*}/ */
 COMMENT \{[^}]*\}
@@ -30,12 +29,11 @@ ID  {LETTER}({LETTER}|{DIGIT})*
 
 /* Translate Rules */
 %%
-{NEWLINE}           { line_number++; }
 {WHITESPACE}        { /* ignore */ }
 {COMMENT}           { /* ignore */ }
 {INT}               { return NUMERO_INT; }
 {FLOAT}             { return NUMERO_REAL; }
-{MALFORMED_NUMBER}  { printf("Error: malformed number '%s' in program (line: %d)\n", yytext, line_number); }
+{MALFORMED_NUMBER}  { printf("Error: malformed number '%s' in program (line: %d)\n", yytext, yylineno); }
 begin               { return _BEGIN; }
 const               { return CONST; }
 do                  { return DO; }
@@ -71,4 +69,4 @@ write               { return WRITE; }
 ";"                 { return PONTO_VIRGULA; }
 "\("                { return ABRE_PARENTESES; }
 "\)"                { return FECHA_PARENTESES; }
-.                   { printf("Error: stray ‘%s’ in program (line: %d)\n", yytext, line_number); }
+.                   { printf("Error: stray ‘%s’ in program (line: %d)\n", yytext, yylineno); }
