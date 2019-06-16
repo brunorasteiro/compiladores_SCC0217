@@ -1,9 +1,9 @@
-programa nome1
+program nome1;
 {exemplo 1}
 var a, a1, b: integer;
 begin
 read(a);
-a1:= 2*a1;
+a1:= a1*2;
 while (a1>0) do
 begin
 write(a1);
