@@ -70,11 +70,7 @@ corpo :
 So it is safer to assume that there would be declarions if there were errors
 before other declaration*/
 dc : 
-        dc_c dc_v dc_p |
-
-        /* Non terminals errors */
-        error dc_v dc_p |
-        dc_c error dc_p
+        dc_c dc_v dc_p 
         ;
 
 /* OBS: left side recursion is actually more efficient in yacc */
@@ -183,7 +179,7 @@ void yyerror(char *s) {
 void main()
 {
     extern int yy_flex_debug;
-    yy_flex_debug = 0; // lexical analyzer switch: 1 - Turn ON; 0 - Turn OFF
+    yy_flex_debug = 1; // lexical analyzer switch: 1 - Turn ON; 0 - Turn OFF
 	yyparse();
 
 
