@@ -17,7 +17,7 @@ test-lex:
 	make lex --no-print-directory
 	@for (( i=0; i < $(ntests); i++ )); do \
 		(./lexical-analyser tests/lex/$${i}input.txt 2>&1) > .output.txt; \
-		diff -b .output.txt tests/lex/$${i}output.txt && echo -e "\ttest #$${i}\t\t** PASS **" || echo -e "\ttest #$${i}\t\t** FAIL **"; \
+		diff -b .output.txt tests/lex/$${i}output.txt &> /dev/null && echo -e "\ttest #$${i}\t\t** PASS **" || echo -e "\ttest #$${i}\t\t** FAIL **"; \
 	done
 	@rm .output.txt
 	rm lexical-analyser
@@ -39,6 +39,12 @@ test-syn:
 	done
 	@rm .output.txt
 	rm syntactic-analyser
+
+analyse-grammar:
+	@cd src; \
+		bison bison.y -d --file-prefix=y --debug --verbose; \
+		cat y.output; \
+		rm -f y.output y.tab.h y.tab.c;
 
 clean:
 	cd src && rm -f lex.yy.c y.tab.c y.tab.h

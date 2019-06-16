@@ -3,7 +3,7 @@
  * lexical analyser alone, as specified in the
  * first assignment.
  */
-
+#include <stdlib.h>
 #include <stdio.h>
 #include "y.tab.h"
 
@@ -67,39 +67,19 @@ char* token_label(int token) {
       return "while";
     case WRITE:
       return "write";
-    case OP_IGUAL:
-      return "=";
-    case OP_DIFERENTE:
-      return "<>";
-    case OP_MAIOR_IGUAL:
-      return ">=";
-    case OP_MENOR_IGUAL:
-      return "<=";
-    case OP_MAIOR:
-      return ">";
-    case OP_MENOR:
-      return "<";
-    case OP_ADICAO:
-      return "+";
-    case OP_SUBTRACAO:
-      return "-";
-    case OP_MULTIPLICACAO:
-      return "*";
-    case OP_DIVISAO:
-      return "/";
-    case OP_ATRIBUICAO:
+    case OP_ASSIGN:
       return ":=";
-    case PONTO:
-      return ".";
-    case VIRGULA:
-      return ",";
-    case DOIS_PONTOS:
-      return ":";
-    case PONTO_VIRGULA:
-      return ";";
-    case ABRE_PARENTESES:
-      return "(";
-    case FECHA_PARENTESES:
-      return ")";
+    case OP_DIFF:
+      return "<>";
+    case OP_GE:
+      return ">=";
+    case OP_LE:
+      return "<=";
+    default: {
+      char* label = (char*) malloc(2);
+      *label = (char) token;
+      *(label + 1) = '\0';
+      return label;
+    }
   }
 }

@@ -44,7 +44,6 @@ programa : PROGRAM IDENT ';' corpo '.' ;
 
 corpo :   dc _BEGIN comandos END ;
 
-
 dc : dc_c dc_v dc_p ;
 
 dc_c : CONST IDENT '=' numero ';' dc_c | %empty ;
@@ -90,7 +89,7 @@ cmd : READ '(' variaveis ')' |
 
 condicao : expressao relacao expressao ;
 
-relacao : '=' | "<>" | ">=" | "<=" | '<' | '>' ;
+relacao : '=' | "<>" | '<' | '>' | "<=" | ">=" ;
 
 expressao : termo outros_termos ;
 

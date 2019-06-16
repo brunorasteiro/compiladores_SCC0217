@@ -92,7 +92,7 @@ line:
 
 This addition to the grammar allows for simple error recovery in the event of a syntax error. If an expression that cannot be evaluated is read, the error will be recognized by the third rule for line, and parsing will continue. (The yyerror function is still called upon to print its message as well.) The action executes the statement yyerrok, a macro defined automatically by Bison; its meaning is that error recovery is complete (see Error Recovery). Note the difference between yyerrok and yyerror; neither one is a misprint.
 
-#### 3.3.3 Recursive Rules
+### 3.3.3 Recursive Rules
 
 Consider this recursive definition of a comma-separated sequence of one or more expressions:
 
@@ -113,3 +113,32 @@ expseq1:
 ```
 
 Any kind of sequence can be defined using either left recursion or right recursion, _**but you should always use left recursion, because it can parse a sequence of any number of elements with bounded stack space. Right recursion uses up space on the Bison stack in proportion to the number of elements in the sequence, because all the elements must be shifted onto the stack before the rule can be applied even once.**_ See The Bison Parser Algorithm, for further explanation of this.
+
+### 3.7 Bison Declarations
+
+**The first rule in the grammar file also specifies the start symbol, by default.** If you want some other symbol to be the start symbol, you must declare it explicitly (see Languages and Context-Free Grammars).
+
+### 3.7.3 Operator Precedence
+
+```Haskell
+%left symbols…
+%left <type> symbols…
+
+%token OR "||"
+%left OR "<="
+```
+
+And indeed any of these declarations serves the purposes of %token. But in addition, they specify the associativity and relative precedence for all the symbols:
+
+- The associativity of an operator op determines how repeated uses of the operator nest: whether ‘x op y op z’ is parsed by grouping x with y first or by grouping y with z first. %left specifies left-associativity (grouping x with y first) and %right specifies right-associativity (grouping y with z first). %nonassoc specifies no associativity, which means that ‘x op y op z’ is considered a syntax error.
+%precedence gives only precedence to the symbols, and defines no associativity at all. Use this to define precedence only, and leave any potential conflict due to associativity enabled.
+- The precedence of an operator determines how it nests with other operators. All the tokens declared in a single precedence declaration have equal precedence and nest together according to their associativity. **When two tokens declared in different precedence declarations associate, the one declared later has the higher precedence and is grouped first.**
+
+### 4.1 The Parser Function yyparse
+
+You call the function yyparse to cause parsing to occur. This function reads tokens, executes actions, and ultimately returns when it encounters end-of-input or an unrecoverable syntax error. You can also write an action which directs yyparse to return immediately without reading further.
+
+#### Function: int yyparse (void)
+- The value returned by yyparse is 0 if parsing was successful (return is due to end-of-input).
+- The value is 1 if parsing failed because of invalid input, i.e., input that contains a syntax error or that causes YYABORT to be invoked.
+- The value is 2 if parsing failed due to memory exhaustion.
