@@ -34,12 +34,11 @@ NUMBER {INT}|{REAL}
 MALFORMED_NUMBER {NUMBER}{ID}
 
 /* symbols */
-RELATION =|<>|>=|<=|>|<
+RELATION =|>|<
 OP_AD \+|-
 OP_MUL \*|\/
-POINT \.
-SYMBOLS ,|:|;|\(|\)|:=
-REST {RELATION}|{OP_AD}|{OP_MUL}|{POINT}|{SYMBOLS}
+SYMBOLS \.|,|:|;|\(|\)
+REST {RELATION}|{OP_AD}|{OP_MUL}|{SYMBOLS}
 
 /* identificator */
 ID {LETTER}({LETTER}|{DIGIT})*
