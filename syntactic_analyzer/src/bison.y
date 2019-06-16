@@ -1,17 +1,16 @@
-%{
-#include<stdio.h>
-int yylex();
+%{/* Prologue */
+
+#include <stdio.h>
+#include <string.h>
+extern FILE* yyin;
+extern int yydebug;
+extern int yylex();
 void yyerror(char* s);
-void standard_error(char* expected, int obtained);
-%}
+// void standard_error(char* expected, int obtained);
+
+%} /* Bison Declarations */
 
 %start programa
-
-%union
-{
-    int number;
-    char *string;
-}
 
 %token _BEGIN
 %token CONST
@@ -33,125 +32,109 @@ void standard_error(char* expected, int obtained);
 %token VAR
 %token WHILE
 %token WRITE
+%token OP_ASSIGN  ":="
+%token OP_DIFF    "<>"
+%token OP_GE      ">="
+%token OP_LE      "<="
 
-%token OP_IGUAL
-%token OP_DIFERENTE
-%token OP_MAIOR_IGUAL
-%token OP_MENOR_IGUAL
-%token OP_MAIOR
-%token OP_MENOR
-%token OP_ADICAO
-%token OP_SUBTRACAO
-%token OP_MULTIPLICACAO
-%token OP_DIVISAO
-%token OP_ATRIBUICAO
-%token PONTO
-%token VIRGULA
-%token DOIS_PONTOS
-%token PONTO_VIRGULA
-%token ABRE_PARENTESES
-%token FECHA_PARENTESES
+%% /* Grammar Rules */
 
-%%
 /* erros no <corpo> ficam para as regras dentro de corpo traterem */
-programa : PROGRAM IDENT PONTO_VIRGULA corpo PONTO
-        |  error  IDENT {printf("##########\n\n");} PONTO_VIRGULA corpo PONTO {yyerrok; yyclearin; standard_error("program", yychar);}
-        |  PROGRAM error PONTO_VIRGULA corpo PONTO {yyerrok; yyclearin; printf("Erro: identificador esperado\n");}
-        |  PROGRAM IDENT error corpo PONTO {yyerrok; yyclearin; printf("Erro: ';' esperado\n");}
-        |  PROGRAM IDENT PONTO_VIRGULA corpo error {yyerrok; yyclearin; printf("Erro: '.' esperado\n");}
-        |  error {printf("Erro: '.' esperado\n");}
-        ;
+programa : PROGRAM IDENT ';' corpo '.' ;
 
-corpo :   dc _BEGIN comandos END
-        | dc error comandos END {yyerrok; yyclearin; printf("Erro: '.' esperado\n");}
-
-        ;
+corpo :   dc _BEGIN comandos END ;
 
 
 dc : dc_c dc_v dc_p ;
 
-dc_c : CONST IDENT OP_IGUAL numero PONTO_VIRGULA dc_c | ;
+dc_c : CONST IDENT '=' numero ';' dc_c | %empty ;
 
-dc_v : VAR variaveis DOIS_PONTOS tipo_var PONTO_VIRGULA dc_v | ;
+dc_v : VAR variaveis ':' tipo_var ';' dc_v | %empty ;
 
 tipo_var : REAL | INTEGER ;
 
 variaveis : IDENT mais_var ;
 
-mais_var : VIRGULA variaveis | ;
+mais_var : ',' variaveis | %empty ;
 
-dc_p : PROCEDURE IDENT parametros PONTO_VIRGULA corpo_p dc_p | ;
+dc_p : PROCEDURE IDENT parametros ';' corpo_p dc_p | %empty ;
 
-parametros : ABRE_PARENTESES lista_par FECHA_PARENTESES | ;
+parametros : '(' lista_par ')' | %empty ;
 
-lista_par : variaveis DOIS_PONTOS tipo_var mais_par ;
+lista_par : variaveis ':' tipo_var mais_par ;
 
-mais_par : PONTO_VIRGULA lista_par | ;
+mais_par : ';' lista_par | %empty ;
 
-corpo_p : dc_loc _BEGIN comandos END PONTO_VIRGULA ;
+corpo_p : dc_loc _BEGIN comandos END ';' ;
 
 dc_loc : dc_v ;
 
-lista_arg : ABRE_PARENTESES argumentos FECHA_PARENTESES | ;
+lista_arg : '(' argumentos ')' | %empty ;
 
 argumentos : IDENT mais_ident ;
 
-mais_ident : PONTO_VIRGULA argumentos | ;
+mais_ident : ';' argumentos | %empty ;
 
-pfalsa : ELSE cmd | ;
+pfalsa : ELSE cmd | %empty ;
 
-comandos : cmd PONTO_VIRGULA comandos
-        |  cmd error comandos {yyerrok; printf("Erro: ';' esperado\n");}
-        |
-        ;
+comandos : cmd ';' comandos | %empty ;
 
-cmd : READ ABRE_PARENTESES variaveis FECHA_PARENTESES |
-   WRITE ABRE_PARENTESES variaveis FECHA_PARENTESES |
-   WHILE ABRE_PARENTESES condicao FECHA_PARENTESES DO cmd |
+cmd : READ '(' variaveis ')' |
+   WRITE '(' variaveis ')' |
+   WHILE '(' condicao ')' DO cmd |
    IF condicao THEN cmd pfalsa |
-   IDENT OP_ATRIBUICAO expressao |
+   IDENT ":=" expressao |
    IDENT lista_arg |
    _BEGIN comandos END |
-   FOR IDENT OP_ATRIBUICAO expressao TO expressao DO cmd ;
+   FOR IDENT ":=" expressao TO expressao DO cmd ;
 
 condicao : expressao relacao expressao ;
 
-relacao : OP_IGUAL | OP_DIFERENTE | OP_MAIOR_IGUAL | OP_MENOR_IGUAL | OP_MENOR | OP_MAIOR ;
+relacao : '=' | "<>" | ">=" | "<=" | '<' | '>' ;
 
 expressao : termo outros_termos ;
 
-op_un : OP_ADICAO | OP_SUBTRACAO | ;
+op_un : '+' | '-' | %empty ;
 
-outros_termos : op_ad termo outros_termos | ;
+outros_termos : op_ad termo outros_termos | %empty ;
 
-op_ad : OP_ADICAO | OP_SUBTRACAO ;
+op_ad : '+' | '-' ;
 
 termo : op_un fator mais_fatores ;
 
-mais_fatores : op_mul fator mais_fatores | ;
+mais_fatores : op_mul fator mais_fatores | %empty ;
 
-op_mul : OP_MULTIPLICACAO | OP_DIVISAO ;
+op_mul : '*' | '/' ;
 
-fator : IDENT | numero | ABRE_PARENTESES expressao FECHA_PARENTESES ;
+fator : IDENT | numero | '(' expressao ')' ;
 
 numero : NUMERO_INT | NUMERO_REAL ;
 
-%%
+%% /* Epilogue */
 
-void main(){
-	//printf("digite expr : \n");
-	yyparse();
-	// printf("expr válida \n");
-	// int token;
-    // while ((token = yylex()) != 0)
-    // {
-    //     printf("Token: %d\n", token);
-    // }
-    // return;
+void yyerror(char* msg) {
+  fprintf(stderr, "%s\n", msg);
 }
 
-void yyerror(char* str){}
+int main(int argc, char** argv) {
+  argc--, argv++; /* Ignore program name. */
 
-void standard_error(char* expected, int obtained){
-    printf("Erro: Esperado '%s', obtido '%d'\n", expected, obtained);
+  /*
+   * Enable debugging with --debug option.
+   * Use the other argument as the input file if provided.
+   */
+   int opened_input = 0;
+  for (int i = 0; i < argc; i++)
+    if (strcmp(argv[i], "--debug") == 0)
+      yydebug = 1;
+    else if (!opened_input) {
+      opened_input = 1;
+      yyin = fopen(argv[i], "r");
+    }
+
+  return yyparse();
 }
+
+// void standard_error(char* expected, int obtained){
+//     printf("Erro: Esperado '%s', obtido '%d'\n", expected, obtained);
+// }

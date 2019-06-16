@@ -1,4 +1,4 @@
-# syntactic analyzer
+# syntactic analyser
 
 ## flex
 
@@ -75,3 +75,41 @@ expr:
   "identifier"
 ;
 ```
+
+### yyerrok
+
+#### 2.3 Simple Error Recovery
+
+The Bison language itself includes the reserved word error, which may be included in the grammar rules. In the example below it has been added to one of the alternatives for line:
+
+```Haskell
+line:
+  '\n'
+| exp '\n'   { printf ("\t%.10g\n", $1); }
+| error '\n' { yyerrok;                  }
+;
+```
+
+This addition to the grammar allows for simple error recovery in the event of a syntax error. If an expression that cannot be evaluated is read, the error will be recognized by the third rule for line, and parsing will continue. (The yyerror function is still called upon to print its message as well.) The action executes the statement yyerrok, a macro defined automatically by Bison; its meaning is that error recovery is complete (see Error Recovery). Note the difference between yyerrok and yyerror; neither one is a misprint.
+
+#### 3.3.3 Recursive Rules
+
+Consider this recursive definition of a comma-separated sequence of one or more expressions:
+
+```Haskell
+expseq1:
+  exp
+| expseq1 ',' exp
+;
+```
+
+Since the recursive use of expseq1 is the leftmost symbol in the right hand side, we call this left recursion. By contrast, here the same construct is defined using right recursion:
+
+```Haskell
+expseq1:
+  exp
+| exp ',' expseq1
+;
+```
+
+Any kind of sequence can be defined using either left recursion or right recursion, _**but you should always use left recursion, because it can parse a sequence of any number of elements with bounded stack space. Right recursion uses up space on the Bison stack in proportion to the number of elements in the sequence, because all the elements must be shifted onto the stack before the rule can be applied even once.**_ See The Bison Parser Algorithm, for further explanation of this.

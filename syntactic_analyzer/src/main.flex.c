@@ -1,6 +1,6 @@
 /**
  * This file defines the main function for the
- * lexical analyzer alone, as specified in the
+ * lexical analyser alone, as specified in the
  * first assignment.
  */
 

@@ -1,12 +1,13 @@
 /* Definitions Section */
 %{
 #include <stdio.h>
+#include <string.h>
 #include "y.tab.h"
 %}
 
-%option bison-bridge
-%option noyywrap
 %option yylineno
+%option noyywrap
+%option bison-bridge
 
 /* whitespace: / |\t|\r?\n/ */
 WHITESPACE  " "|\t|\r?\n
@@ -52,21 +53,21 @@ var                 { return VAR; }
 while               { return WHILE; }
 write               { return WRITE; }
 {ID}                { return IDENT; }
-":="                { return OP_ATRIBUICAO; }
-"<>"                { return OP_DIFERENTE; }
-">="                { return OP_MAIOR_IGUAL; }
-"<="                { return OP_MENOR_IGUAL; }
-"="                 { return OP_IGUAL; }
-">"                 { return OP_MAIOR; }
-"<"                 { return OP_MENOR; }
-"\+"                { return OP_ADICAO; }
-"-"                 { return OP_SUBTRACAO; }
-"\*"                { return OP_MULTIPLICACAO; }
-"\/"                { return OP_DIVISAO; }
-"\."                { return PONTO; }
-","                 { return VIRGULA; }
-":"                 { return DOIS_PONTOS; }
-";"                 { return PONTO_VIRGULA; }
-"\("                { return ABRE_PARENTESES; }
-"\)"                { return FECHA_PARENTESES; }
+":="                { return OP_ASSIGN; }
+"<>"                { return OP_DIFF; }
+">="                { return OP_GE; }
+"<="                { return OP_LE; }
+"="                 { return '='; }
+">"                 { return '>'; }
+"<"                 { return '<'; }
+"\+"                { return '+'; }
+"-"                 { return '-'; }
+"\*"                { return '*'; }
+"\/"                { return '/'; }
+"\."                { return '.'; }
+","                 { return ','; }
+":"                 { return ':'; }
+";"                 { return ';'; }
+"\("                { return '('; }
+"\)"                { return ')'; }
 .                   { printf("Error: stray ‘%s’ in program (line: %d)\n", yytext, yylineno); }
