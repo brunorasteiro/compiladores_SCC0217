@@ -15,9 +15,10 @@ ntests=$(shell ls tests/lex/*input.txt | wc -w)
 test-lex:
 	@echo "Testing lexer... (found $(ntests) tests)"
 	make lex --no-print-directory
-	@for (( i=0; i < $(ntests); i++ )); do \
-		(./lexical-analyser tests/lex/$${i}input.txt 2>&1) > .output.txt; \
-		diff -b .output.txt tests/lex/$${i}output.txt &> /dev/null && echo -e "\ttest #$${i}\t\t** PASS **" || echo -e "\ttest #$${i}\t\t** FAIL **"; \
+	@for test_input in tests/lex/*input.txt; do \
+		i=$$(echo $$test_input | grep -oE '[0-9]+'); \
+		(./lexical-analyser $$test_input 2>&1) > .output.txt; \
+		(diff -b .output.txt tests/lex/$${i}output.txt 2>&1) > /dev/null && echo "\ttest #$${i}\t\t** PASS **" || echo "\ttest #$${i}\t\t** FAIL **"; \
 	done
 	@rm .output.txt
 	rm lexical-analyser
@@ -33,9 +34,10 @@ ntests_syn=$(shell ls tests/syn/*input.txt | wc -w)
 test-syn:
 	@echo "Testing syntactic analyser... (found $(ntests_syn) tests)"
 	make syn --no-print-directory
-	@for (( i=0; i < $(ntests_syn); i++ )); do \
-		(./syntactic-analyser tests/syn/$${i}input.txt 2>&1) > .output.txt; \
-		diff -b .output.txt tests/syn/$${i}output.txt &> /dev/null && echo -e "\ttest #$${i}\t\t** PASS **" || echo -e "\ttest #$${i}\t\t** FAIL **"; \
+	@for test_input in tests/syn/*input.txt; do \
+		i=$$(echo $$test_input | grep -oE '[0-9]+'); \
+		(./syntactic-analyser $$test_input 2>&1) > .output.txt; \
+		(diff -b .output.txt tests/syn/$${i}output.txt 2>&1) > /dev/null && echo "\ttest #$${i}\t\t** PASS **" || echo "\ttest #$${i}\t\t** FAIL **"; \
 	done
 	@rm .output.txt
 	rm syntactic-analyser
