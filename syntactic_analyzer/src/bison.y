@@ -10,7 +10,16 @@ void yyerror(const char* s);
 
 %} /* Bison Declarations */
 
+/* Especify the grammar's initial non-terminal symbol: "programa". */
 %start programa
+
+/**
+ * The following bison statement supresses the one
+ * conflict warning. The conflict comes from the
+ * ambiguity of the rules that generate if-then-else
+ * constructs.
+ */
+%expect 1
 
 %define parse.error verbose
 
