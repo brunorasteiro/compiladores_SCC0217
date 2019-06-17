@@ -2,11 +2,14 @@
 
 #include <stdio.h>
 #include <string.h>
+
 extern FILE* yyin;
 extern int yydebug;
 extern int yylex();
 extern int yylineno;
+
 void yyerror(const char* s);
+const char* prettify_error_message(const char* msg);
 
 %} /* Bison Declarations */
 
@@ -21,8 +24,16 @@ void yyerror(const char* s);
  */
 %expect 1
 
+/* Set bison's error reporting to be verbose. */
 %define parse.error verbose
 
+/**
+ * Here comes all terminal symbols that have a length
+ * greater than 1 as a string (e.g. "begin", ":=", etc).
+ * Terminal symbols made of only one character are returned
+ * directly by the lexer and are used directly as C
+ * character literals in the grammar rules (e.g. ':', '*').
+ */
 %token _BEGIN
 %token CONST
 %token DO
@@ -51,53 +62,57 @@ void yyerror(const char* s);
 %% /* Grammar Rules */
 
 programa :
-        PROGRAM IDENT ';'   corpo '.' |
+        PROGRAM IDENT ';'   corpo '.'   |
 
-        /* Terminals errors */
+        /* Errors on terminal symbols */
         error   IDENT ';'   corpo '.'   |
         PROGRAM error ';'   corpo '.'   |
         PROGRAM IDENT error corpo '.'   |
         PROGRAM IDENT ';'   corpo error |
-
-        // error ';' {extern int line_number; pv_number = line_number;} corpo '.' { yyerrok; errfunc("CU DE CURIOSO"); printf("\nLINHA %d\n", pv_number); }
-        error ';' corpo '.'
+        error         ';'   corpo '.'
         ;
 
 corpo :
-        dc _BEGIN   comandos END |
+        dc _BEGIN comandos END |
 
-        /* Terminals errors */
-        dc error    comandos END   |
-        dc _BEGIN   comandos error
+        /* Errors on terminal symbols */
+        dc error  comandos END   |
+        dc _BEGIN comandos error
         ;
 
 dc : dc_c dc_v dc_p ;
 
-/* Since this rule may not show in code, we can only know it happend
-when the first terminal appeared */
+/**
+ * Since this rule may not show in code, we can only
+ * know it happend when its first terminal appeared.
+ */
 dc_c :
-        CONST IDENT '='     numero ';'      dc_c | %empty |
+        CONST IDENT '='   numero ';'  dc_c |
+        %empty |
 
-        /* Terminals errors */
-        CONST error '='     numero  ';'     dc_c |
-        CONST IDENT error   numero  ';'     dc_c |
-        CONST IDENT '='     error   ';'     dc_c
+        /* Errors on terminal symbols */
+        CONST error '='   numero ';' dc_c |
+        CONST IDENT error numero ';' dc_c |
+        CONST IDENT '='   error  ';' dc_c
         ;
 
-/* Since this rule may not show in code, we can only know it happend
-when the first terminal appeared */
+/**
+ * Since this rule may not show in code, we can only
+ * know it happend when its first terminal appeared.
+ */
 dc_v :
-        VAR     variaveis ':'   tipo_var ';'    dc_v | %empty |
+        VAR variaveis ':'   tipo_var ';'    dc_v |
+        %empty |
 
-        /* Terminals errors */
-        VAR     variaveis error tipo_var ';'    dc_v |
-        VAR     variaveis ':'   tipo_var error  dc_v
+        /* Errors on terminal symbols */
+        VAR variaveis error tipo_var ';'    dc_v |
+        VAR variaveis ':'   tipo_var error  dc_v
         ;
 
 tipo_var :
         REAL | INTEGER |
 
-        /* Terminals errors */
+        /* Errors on terminal symbols */
         error
         ;
 
@@ -108,17 +123,19 @@ mais_var : ',' variaveis | %empty ;
 /* Since this rule may not show in code, we can only know it happend
 when the first terminal appeared */
 dc_p :
-        PROCEDURE   IDENT parametros ';'    corpo_p dc_p | %empty |
+        PROCEDURE   IDENT parametros ';'    corpo_p dc_p |
+        %empty |
 
-        /* Terminals errors */
+        /* Errors on terminal symbols */
         PROCEDURE   error parametros ';'    corpo_p dc_p |
         PROCEDURE   IDENT parametros error  corpo_p dc_p
         ;
 
 parametros :
-        '('     lista_par ')'   | %empty |
+        '('     lista_par ')'   |
+        %empty |
 
-        /* Terminals errors */
+        /* Errors on terminal symbols */
         '('     lista_par error
         ;
 
@@ -129,7 +146,7 @@ mais_par : ';' lista_par | %empty ;
 corpo_p :
         dc_loc  _BEGIN comandos END ';' |
 
-        /* Terminals errors */
+        /* Errors on terminal symbols */
         dc_loc  error   comandos END    ';' |
         dc_loc  _BEGIN  comandos error  ';'
         ;
@@ -137,13 +154,14 @@ corpo_p :
 dc_loc : dc_v ;
 
 lista_arg :
-        '(' argumentos ')' | %empty |
+        '(' argumentos ')' |
+        %empty |
 
-        /* Terminals errors */
+        /* Errors on terminal symbols */
         error   argumentos  ')' |
         '('     argumentos  error |
 
-        /* Non terminal errors */
+        /* Errors on non terminal symbols */
         '('     error       ')'
         ;
 
@@ -158,34 +176,34 @@ comandos : cmd ';' comandos | %empty ;
 cmd_read :
         READ '(' variaveis ')' |
 
-        /* Terminals errors */
+        /* Errors on terminal symbols */
         READ error  variaveis   ')' |
         READ '('    variaveis   error |
 
-        /* Non terminal errors */
+        /* Errors on non terminal symbols */
         READ '('    error       ')'
         ;
 
 cmd_write :
         WRITE '(' variaveis ')' |
 
-        /* Terminals errors */
+        /* Errors on terminal symbols */
         WRITE error  variaveis   ')' |
         WRITE '('    variaveis   error |
 
-        /* Non terminal errors */
+        /* Errors on non terminal symbols */
         WRITE '('    error       ')'
         ;
 
 cmd_while :
         WHILE '(' condicao ')' DO cmd |
 
-        /* Terminals errors */
+        /* Errors on terminal symbols */
         WHILE error condicao   ')'      DO      cmd |
         WHILE '('   condicao   error    DO      cmd |
         WHILE '('   condicao   ')'      error   cmd |
 
-        /* Non terminal errors */
+        /* Errors on non terminal symbols */
         WHILE '('   error       ')'         DO      cmd |
         WHILE '('   condicao    ')'         DO      error
         ;
@@ -196,35 +214,30 @@ cmd_if : IF condicao THEN cmd pfalsa ;
 cmd_assign :
         IDENT ":=" expressao |
 
-        /* Non terminal errors */
+        /* Errors on non terminal symbols */
         IDENT ":=" error
         ;
 
 
-cmd_fcall :
-        IDENT lista_arg
-
-        /* Non terminal errors */
-        //| IDENT error
-        ;
+cmd_fcall : IDENT lista_arg ;
 
 cmd_block_code :
         _BEGIN comandos END |
 
-        /* Non terminal errors */
+        /* Errors on non terminal symbols */
         _BEGIN error END
         ;
 
 cmd_for :
         FOR IDENT ":=" expressao TO expressao DO cmd |
 
-        /* Terminal errors */
+        /* Errors on terminal symbols */
         FOR error ":=" expressao TO expressao DO cmd |
         FOR IDENT error expressao TO expressao DO cmd |
         FOR IDENT ":=" expressao error expressao DO cmd |
         FOR IDENT ":=" expressao TO expressao error cmd |
 
-        /* Non terminal errors */
+        /* Errors on non terminal symbols */
         FOR IDENT ":=" error TO expressao DO cmd |
         FOR IDENT ":=" expressao TO error DO cmd |
         FOR IDENT ":=" expressao TO expressao DO error
@@ -244,10 +257,10 @@ cmd :
 condicao :
     expressao relacao expressao |
 
-    /* Terminal errors */
+    /* Errors on terminal symbols */
     expressao error expressao |
 
-    /* Non terminal errors */
+    /* Errors on non terminal symbols */
     error relacao expressao |
     expressao relacao error
     ;
@@ -259,9 +272,10 @@ expressao : termo outros_termos ;
 op_un : '+' | '-' | %empty ;
 
 outros_termos :
-        op_ad termo outros_termos | %empty |
+        op_ad termo outros_termos |
+        %empty |
 
-        /* Non terminal errors */
+        /* Errors on non terminal symbols */
         op_ad error outros_termos
         ;
 
@@ -270,14 +284,15 @@ op_ad : '+' | '-' ;
 termo :
         op_un fator mais_fatores |
 
-        /* Non terminal errors */
+        /* Errors on non terminal symbols */
         error fator mais_fatores
         ;
 
 mais_fatores :
-        op_mul fator mais_fatores | %empty |
+        op_mul fator mais_fatores |
+        %empty |
 
-        /* Non terminal errors */
+        /* Errors on non terminal symbols */
         op_mul error mais_fatores
         ;
 
@@ -289,6 +304,12 @@ numero : NUMERO_INT | NUMERO_REAL ;
 
 %% /* Epilogue */
 
+/**
+ * This function is invoked by the parser whenver it
+ * encouters an error. The error messages returned from
+ * the parser are simply prettified and printed to the
+ * screen.
+ */
 void yyerror(const char* msg) {
   fprintf(stderr, "%s (line: %d)\n", msg, yylineno);
 }
@@ -305,8 +326,13 @@ int main(int argc, char** argv) {
     if (strcmp(argv[i], "--debug") == 0)
       yydebug = 1;
     else if (!opened_input) {
-      opened_input = 1;
       yyin = fopen(argv[i], "r");
+      if (yyin)
+        opened_input = 1;
+      else {
+        fprintf(stderr, "Error opening file \"%s\" (reading from stdin instead)\n", argv[i]);
+        yyin = stdin;
+      }
     }
 
   return yyparse();

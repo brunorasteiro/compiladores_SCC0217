@@ -15,6 +15,12 @@ syntactic: src/flex.l src/bison.y
 		gcc y.tab.c lex.yy.c -o ../syntactic-analyser; \
 		rm -f lex.yy.c y.tab.h y.tab.c
 
+analyse-grammar:
+	@cd src; \
+		bison bison.y -d --file-prefix=y --debug --verbose; \
+		cat y.output; \
+		rm -f y.output y.tab.h y.tab.c;
+
 ntests=$(shell ls tests/lexical/*input.txt | wc -w)
 test-lexical:
 	@echo "Testing lexer... (found $(ntests) tests)"
@@ -38,12 +44,6 @@ test-syntactic:
 	done
 	@rm .output.txt
 	rm syntactic-analyser
-
-analyse-grammar:
-	@cd src; \
-		bison bison.y -d --file-prefix=y --debug --verbose; \
-		cat y.output; \
-		rm -f y.output y.tab.h y.tab.c;
 
 clean:
 	cd src && rm -f lex.yy.c y.tab.c y.tab.h

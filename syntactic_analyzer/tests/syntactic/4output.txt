@@ -1,0 +1,2 @@
+syntax error, unexpected THEN (line: 5)
+syntax error, unexpected ';', expecting THEN (line: 5)

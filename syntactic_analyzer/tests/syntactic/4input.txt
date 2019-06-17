@@ -1,0 +1,6 @@
+program nome1;
+{exemplo 1}
+var a, a1, b: integer;
+begin
+  if af then write(a);
+end.
