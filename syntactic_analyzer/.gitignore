@@ -5,3 +5,4 @@ lexical-analyser
 syntactic-analyser
 tmp
 y.output
+.output.txt
